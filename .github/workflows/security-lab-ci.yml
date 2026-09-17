@@ -1,0 +1,46 @@
+name: Security Lab CI
+
+on:
+  push:
+    branches:
+      - master
+      - feat/blockchain-security-lab-v1
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.13.0"
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install dependencies
+        run: npm install
+      - name: Compile
+        run: npm run compile
+      - name: Test
+        run: npm test
+
+  slither:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.13.0"
+      - name: Install JavaScript dependencies
+        run: npm install
+      - name: Install Slither and solc
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install slither-analyzer solc-select
+          solc-select install 0.8.37
+          solc-select use 0.8.37
+      - name: Run Slither
+        run: npm run slither
