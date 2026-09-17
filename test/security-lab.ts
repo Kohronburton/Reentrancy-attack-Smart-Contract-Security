@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { network } from "hardhat";
 
-const { ethers } = await network.connect();
+const { ethers } = await network.create();
 
 async function deployAndWait(name: string, args: unknown[] = [], options?: { value?: bigint }) {
   const contract = await ethers.deployContract(name, args, options ?? {});
@@ -28,7 +28,7 @@ describe("Blockchain Security Lab", function () {
       await secure.connect(victim).deposit({ value: ethers.parseEther("5") });
       const blocked = await deployAndWait("ReentrancyAttacker", [await secure.getAddress()]);
 
-      await expect(blocked.connect(owner).attack({ value: ethers.parseEther("1") })).to.be.reverted;
+      await expect(blocked.connect(owner).attack({ value: ethers.parseEther("1") })).to.revert(ethers);
       expect(await ethers.provider.getBalance(await secure.getAddress())).to.equal(ethers.parseEther("10"));
     });
   });
@@ -44,7 +44,7 @@ describe("Blockchain Security Lab", function () {
 
       const secure = await deployAndWait("SecureTreasury", [owner.address]);
       await owner.sendTransaction({ to: await secure.getAddress(), value: ethers.parseEther("2") });
-      await expect(secure.connect(attacker).sweep(attacker.address)).to.be.reverted;
+      await expect(secure.connect(attacker).sweep(attacker.address)).to.revert(ethers);
       expect(await ethers.provider.getBalance(await secure.getAddress())).to.equal(ethers.parseEther("2"));
     });
   });
@@ -60,7 +60,7 @@ describe("Blockchain Security Lab", function () {
       expect(await ethers.provider.getBalance(await phisher.getAddress())).to.equal(ethers.parseEther("2"));
 
       const secure = await deployAndWait("SecureAuthorizationVault", [owner.address], { value: ethers.parseEther("2") });
-      await expect(secure.connect(attacker).withdrawAll(attacker.address)).to.be.reverted;
+      await expect(secure.connect(attacker).withdrawAll(attacker.address)).to.revert(ethers);
       expect(await ethers.provider.getBalance(await secure.getAddress())).to.equal(ethers.parseEther("2"));
     });
   });
