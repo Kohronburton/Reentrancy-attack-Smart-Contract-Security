@@ -25,9 +25,13 @@ contract SecureCheckedPayout {
     receive() external payable {}
 
     function pay(address payable recipient, uint256 amount) external {
+        require(recipient != address(0), "zero recipient");
         require(address(this).balance >= amount, "insufficient funds");
+
+        // Effects before interaction. A failed transfer reverts this state change atomically.
+        paid[recipient] = true;
+
         (bool ok, ) = recipient.call{value: amount}("");
         require(ok, "payment failed");
-        paid[recipient] = true;
     }
 }
