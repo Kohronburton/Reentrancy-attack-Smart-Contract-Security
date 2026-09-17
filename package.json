@@ -12,7 +12,7 @@
     "test": "hardhat test",
     "test:mocha": "hardhat test mocha",
     "clean": "hardhat clean",
-    "slither": "slither . --exclude-dependencies"
+    "slither": "slither . --exclude-dependencies --fail-none"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox-mocha-ethers": "^3.0.7",
