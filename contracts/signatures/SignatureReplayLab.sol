@@ -33,6 +33,7 @@ contract SecureSignedPayout {
     mapping(address => mapping(uint256 => bool)) public nonceUsed;
 
     constructor(address authorizedSigner) payable {
+        require(authorizedSigner != address(0), "zero signer");
         signer = authorizedSigner;
     }
 
